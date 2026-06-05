@@ -1,0 +1,499 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ── Animations ── */
+@keyframes scrollSuits {
+  from { background-position: 0 0; }
+  to   { background-position: 120px 120px; }
+}
+
+@keyframes flicker {
+  0%, 100% {
+    text-shadow:
+      0 0 8px #ff4444,
+      0 0 20px #ff0000,
+      4px 4px 0px #5a0000;
+  }
+  50% {
+    text-shadow:
+      0 0 16px #ff6666,
+      0 0 40px #ff2222,
+      4px 4px 0px #5a0000;
+  }
+}
+
+@keyframes scanline {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(100vh); }
+}
+
+@keyframes dealCard {
+  0% {
+    opacity: 0;
+    transform: rotate(0deg) scale(0.5);
+  }
+  60% {
+    opacity: 1;
+    transform: rotate(var(--angle)) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(var(--angle)) scale(1);
+  }
+}
+
+/* ── Base ── */
+body {
+  background-color: #7a0000;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Ctext x='10' y='45' font-size='32' fill='rgba(255,180,180,0.12)' font-family='serif'%3E♠%3C/text%3E%3Ctext x='70' y='45' font-size='32' fill='rgba(255,180,180,0.12)' font-family='serif'%3E♥%3C/text%3E%3Ctext x='10' y='105' font-size='32' fill='rgba(255,180,180,0.12)' font-family='serif'%3E♦%3C/text%3E%3Ctext x='70' y='105' font-size='32' fill='rgba(255,180,180,0.12)' font-family='serif'%3E♣%3C/text%3E%3C/svg%3E");
+  animation: scrollSuits 6s linear infinite;
+  font-family: 'Press Start 2P', monospace;
+  min-height: 100vh;
+}
+
+/* Scanlines only behind UI */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.12) 3px,
+    rgba(0, 0, 0, 0.12) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Homepage layout ── */
+.homepage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 56px;
+  position: relative;
+
+  /* retro border frame */
+  border: 3px solid #ffe0e0;
+  box-shadow:
+    0 0 0 6px #7a0000,
+    0 0 0 9px #ffe0e0,
+    0 0 40px rgba(255, 180, 180, 0.3);
+  padding: 60px 80px;
+}
+
+/* corner decorations */
+.homepage::before,
+.homepage::after {
+  content: '♠';
+  position: absolute;
+  font-size: 14px;
+  color: #ffe0e0;
+  opacity: 0.8;
+}
+.homepage::before { top: 10px; left: 14px; }
+.homepage::after  { bottom: 10px; right: 14px; }
+
+/* ── Title ── */
+.title {
+  font-size: 56px;
+  font-family: 'Press Start 2P', monospace;
+  color: #fff;
+  letter-spacing: 6px;
+  line-height: 1.3;
+  animation: flicker 2.5s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+  -webkit-text-stroke: 1px #ffaaaa;
+}
+
+/* ── Pixel suit canvas ── */
+.pixel-suit {
+  display: inline-block;
+  vertical-align: middle;
+  width: 110px;
+  height: 110px;
+  margin: 0 12px;
+  position: relative;
+  top: -6px;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9))
+          drop-shadow(0 0 20px rgba(255, 100, 100, 0.7))
+          drop-shadow(0 0 40px rgba(255, 0, 0, 0.4));
+}
+
+/* ── Card hand ── */
+.hand {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, calc(-100% - 16px));
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 320px;
+  width: 560px;
+  z-index: 1;
+}
+
+.card {
+  position: absolute;
+  width: 130px;
+  height: 190px;
+  background: #fffaf9;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
+  box-shadow:
+    4px 4px 0px #111,
+    inset 0 0 0 3px rgba(255,255,255,0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px 8px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-weight: 700;
+  transform-origin: bottom center;
+  opacity: 0;
+  animation: dealCard 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--delay);
+  transform: rotate(var(--angle));
+}
+
+.card-corner {
+  font-size: 15px;
+  line-height: 1.2;
+  text-align: left;
+  letter-spacing: -0.5px;
+}
+
+.card-corner.bottom {
+  align-self: flex-end;
+  text-align: right;
+  transform: rotate(180deg);
+}
+
+.card-suit-center {
+  font-size: 48px;
+  text-align: center;
+  line-height: 1;
+}
+
+/* ── Modal ── */
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: #2a0000;
+  width: 380px;
+  animation: modalIn 0.2s ease forwards;
+  /* Win98 outer raised border */
+  border-top: 2px solid #ff9999;
+  border-left: 2px solid #ff9999;
+  border-right: 2px solid #5a0000;
+  border-bottom: 2px solid #5a0000;
+  box-shadow: 6px 6px 0px #000, inset 0 0 0 1px #7a0000;
+}
+
+/* Win98 title bar */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  background: linear-gradient(to right, #8b0000, #cc2222);
+  border-bottom: 2px solid #5a0000;
+  gap: 8px;
+}
+
+.modal-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: #fff;
+  letter-spacing: 1px;
+  flex: 1;
+  /* Win98 title icon */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-title::before {
+  content: '♠';
+  font-size: 12px;
+}
+
+/* Win98 window control buttons */
+.modal-controls {
+  display: flex;
+  gap: 3px;
+}
+
+.modal-close {
+  width: 18px;
+  height: 18px;
+  background: #c0c0c0;
+  border-top: 2px solid #fff;
+  border-left: 2px solid #fff;
+  border-right: 2px solid #444;
+  border-bottom: 2px solid #444;
+  color: #000;
+  font-size: 10px;
+  font-family: 'Press Start 2P', monospace;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-close:hover { background: #d0d0d0; }
+
+.modal-close:active {
+  border-top: 2px solid #444;
+  border-left: 2px solid #444;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px 18px;
+  /* Win98 sunken inner panel */
+  border-top: 1px solid #5a0000;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #ffaaaa;
+  letter-spacing: 1.5px;
+}
+
+.field input {
+  /* Win98 sunken input */
+  background: #1a0000;
+  border-top: 2px solid #5a0000;
+  border-left: 2px solid #5a0000;
+  border-right: 2px solid #ff9999;
+  border-bottom: 2px solid #ff9999;
+  color: #fff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 10px 12px;
+  outline: none;
+  transition: box-shadow 0.15s;
+}
+
+.field input::placeholder { color: #663333; }
+
+.field input:focus {
+  box-shadow: 0 0 0 1px #ff6666 inset;
+}
+
+.modal-submit {
+  margin-top: 6px;
+  padding: 10px 16px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #000;
+  background: #c0c0c0;
+  /* Win98 raised button */
+  border-top: 2px solid #fff;
+  border-left: 2px solid #fff;
+  border-right: 2px solid #444;
+  border-bottom: 2px solid #444;
+  cursor: pointer;
+  transition: filter 0.1s ease;
+  align-self: flex-end;
+  min-width: 120px;
+}
+
+.modal-submit:hover {
+  filter: brightness(1.1);
+}
+
+.modal-submit:active {
+  border-top: 2px solid #444;
+  border-left: 2px solid #444;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  padding: 11px 15px 9px 17px;
+}
+
+/* ── Buttons ── */
+.btn-group {
+  display: flex;
+  gap: 20px;
+}
+
+.cta-btn {
+  padding: 14px 28px;
+  font-size: 11px;
+  font-family: 'Press Start 2P', monospace;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  background: transparent;
+  border: 2px solid #ffe0e0;
+  border-radius: 0;
+  cursor: pointer;
+  box-shadow: 4px 4px 0px #ffe0e0;
+  transition: all 0.1s ease;
+  image-rendering: pixelated;
+}
+
+.cta-btn:hover {
+  background: #fff;
+  color: #7a0000;
+  box-shadow: 6px 6px 0px #ffaaaa;
+  border-color: #fff;
+  transform: translate(-2px, -2px);
+}
+
+.cta-btn:active {
+  background: #ffcccc;
+  color: #7a0000;
+  border-color: #ffcccc;
+  box-shadow: 2px 2px 0px #fff;
+  transform: translate(2px, 2px);
+}
+
+.cta-btn.secondary {
+  background: transparent;
+  color: #ffe0e0;
+  border-color: #ffe0e0;
+  box-shadow: 4px 4px 0px #ffe0e0;
+}
+
+.cta-btn.secondary:hover {
+  background: #ffe0e0;
+  color: #7a0000;
+  border-color: #ffe0e0;
+  box-shadow: 6px 6px 0px #fff;
+}
+
+.cta-btn.secondary:active {
+  background: #ffcccc;
+  color: #7a0000;
+  box-shadow: 2px 2px 0px #fff;
+}
+
+/* ── Mobile ── */
+@media (max-width: 600px) {
+  .homepage {
+    padding: 40px 24px;
+    gap: 36px;
+    margin: 16px;
+    box-shadow:
+      0 0 0 4px #7a0000,
+      0 0 0 6px #ffe0e0,
+      0 0 24px rgba(255, 180, 180, 0.3);
+  }
+
+  .title {
+    font-size: 28px;
+    letter-spacing: 3px;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .pixel-suit {
+    width: 56px;
+    height: 56px;
+    margin: 0 6px;
+    top: -3px;
+  }
+
+  .hand {
+    width: 300px;
+    height: 200px;
+    transform: translate(-50%, calc(-100% - 10px));
+  }
+
+  .card {
+    width: 72px;
+    height: 104px;
+    padding: 5px 6px;
+    border-radius: 3px;
+  }
+
+  .card-corner {
+    font-size: 9px;
+  }
+
+  .card-suit-center {
+    font-size: 28px;
+  }
+
+  .btn-group {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+  }
+
+  .cta-btn {
+    width: 100%;
+    font-size: 9px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .modal {
+    width: calc(100vw - 32px);
+    margin: 16px;
+  }
+
+  .modal-title {
+    font-size: 8px;
+  }
+
+  .field input {
+    font-size: 9px;
+    padding: 10px;
+  }
+
+  .modal-submit {
+    font-size: 9px;
+    width: 100%;
+    align-self: stretch;
+  }
+}
