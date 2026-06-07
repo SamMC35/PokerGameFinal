@@ -54,6 +54,16 @@ body {
   min-height: 100vh;
 }
 
+/* Warm tint overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 190, 80, 0.06);
+  pointer-events: none;
+  z-index: 0;
+}
+
 /* Scanlines only behind UI */
 body::after {
   content: '';
@@ -349,6 +359,18 @@ body::after {
   filter: brightness(1.1);
 }
 
+.modal-error {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #ff6666;
+  letter-spacing: 1px;
+}
+
+.modal-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .modal-submit:active {
   border-top: 2px solid #444;
   border-left: 2px solid #444;
@@ -414,6 +436,455 @@ body::after {
   background: #ffcccc;
   color: #7a0000;
   box-shadow: 2px 2px 0px #fff;
+}
+
+/* ── Character Creator ── */
+.cc-modal  { width: 460px; }
+
+.signup-modal { width: 780px; }
+
+.signup-body {
+  display: flex;
+  align-items: stretch;
+}
+
+.signup-char {
+  flex: 1;
+}
+
+.signup-divider {
+  width: 2px;
+  background: #5a0000;
+  border-left: 1px solid #ff9999;
+  margin: 12px 0;
+}
+
+.signup-form {
+  flex: 0 0 260px;
+  border-top: none;
+  justify-content: center;
+}
+
+@media (max-width: 800px) {
+  .signup-modal { width: calc(100vw - 32px); }
+  .signup-body  { flex-direction: column; }
+  .signup-divider { width: auto; height: 2px; margin: 0 12px; }
+  .signup-form  { flex: none; }
+}
+
+.cc-body {
+  display: flex;
+  gap: 16px;
+  padding: 16px 18px;
+  align-items: center;
+}
+
+.cc-preview {
+  background: #ffcccc;
+  border-top: 2px solid #5a0000;
+  border-left: 2px solid #5a0000;
+  border-right: 2px solid #ff9999;
+  border-bottom: 2px solid #ff9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  flex-shrink: 0;
+}
+
+.cc-controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cc-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #ffaaaa;
+  letter-spacing: 1px;
+  min-width: 60px;
+}
+
+.cc-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #1a0000;
+  border-top: 2px solid #5a0000;
+  border-left: 2px solid #5a0000;
+  border-right: 2px solid #ff9999;
+  border-bottom: 2px solid #ff9999;
+  padding: 4px 6px;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.cc-value {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #fff;
+  letter-spacing: 1px;
+  min-width: 44px;
+  text-align: center;
+}
+
+.cc-swatch {
+  width: 20px;
+  height: 14px;
+  border: 1px solid #fff;
+  flex-shrink: 0;
+  margin: 0 auto;
+}
+
+.cc-arrow {
+  background: #c0c0c0;
+  border-top: 2px solid #fff;
+  border-left: 2px solid #fff;
+  border-right: 2px solid #444;
+  border-bottom: 2px solid #444;
+  color: #000;
+  font-size: 8px;
+  font-family: 'Press Start 2P', monospace;
+  cursor: pointer;
+  padding: 3px 5px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.cc-arrow:active {
+  border-top: 2px solid #444;
+  border-left: 2px solid #444;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+}
+
+.cc-footer {
+  padding: 0 18px 18px;
+  display: flex;
+}
+
+@media (max-width: 600px) {
+  .cc-modal { width: calc(100vw - 32px); }
+  .cc-body  { flex-direction: column; align-items: center; }
+}
+
+/* ── Join Room — 6-box code input ── */
+.room-code-boxes {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.room-code-box {
+  width: 44px;
+  height: 54px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #fff;
+  background: #1a0000;
+  border-top:    2px solid #5a0000;
+  border-left:   2px solid #5a0000;
+  border-right:  2px solid #ff9999;
+  border-bottom: 2px solid #ff9999;
+  outline: none;
+  caret-color: #ff9999;
+  transition: border-color 0.1s, box-shadow 0.1s;
+}
+
+.room-code-box:focus {
+  border-top:    2px solid #ff9999;
+  border-left:   2px solid #ff9999;
+  border-right:  2px solid #5a0000;
+  border-bottom: 2px solid #5a0000;
+  box-shadow: 0 0 0 1px #ff6666 inset;
+}
+
+.room-code-box.filled {
+  color: #FFD700;
+  border-top:    2px solid #997700;
+  border-left:   2px solid #997700;
+  border-right:  2px solid #FFD700;
+  border-bottom: 2px solid #FFD700;
+}
+
+.room-code-preview {
+  font-size: 14px;
+  color: #FFD700;
+  letter-spacing: 4px;
+  text-align: center;
+  padding: 10px 0 4px;
+  -webkit-text-stroke: 1px #997700;
+}
+
+/* ── Create Room modal extras ── */
+.money-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.money-opt {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  padding: 8px 12px;
+  background: #1a0000;
+  color: #ff9999;
+  border-top:    2px solid #5a0000;
+  border-left:   2px solid #5a0000;
+  border-right:  2px solid #ff9999;
+  border-bottom: 2px solid #ff9999;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: filter 0.1s;
+}
+
+.money-opt:hover { filter: brightness(1.3); }
+
+.money-opt.selected {
+  background: #FFD700;
+  color: #2a0000;
+  border-top:    2px solid #fff8aa;
+  border-left:   2px solid #fff8aa;
+  border-right:  2px solid #997700;
+  border-bottom: 2px solid #997700;
+}
+
+.money-opt:active {
+  border-top:    2px solid #ff9999;
+  border-left:   2px solid #ff9999;
+  border-right:  2px solid #5a0000;
+  border-bottom: 2px solid #5a0000;
+}
+
+.room-summary {
+  background: #1a0000;
+  border-top:    2px solid #5a0000;
+  border-left:   2px solid #5a0000;
+  border-right:  2px solid #ff9999;
+  border-bottom: 2px solid #ff9999;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.room-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rs-label {
+  font-size: 8px;
+  color: #ff9999;
+  letter-spacing: 1px;
+}
+
+.rs-value {
+  font-size: 10px;
+  color: #FFD700;
+  letter-spacing: 1px;
+  max-width: 200px;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Lobby (logged-in) ── */
+.lobby {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+/* Profile card */
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  background: #2a0000;
+  border-top:    2px solid #ff9999;
+  border-left:   2px solid #ff9999;
+  border-right:  2px solid #5a0000;
+  border-bottom: 2px solid #5a0000;
+  box-shadow: 4px 4px 0 #000, inset 0 0 0 1px #7a0000;
+  padding: 14px 18px;
+}
+
+.profile-avatar {
+  background: #ffcccc;
+  border-top:    2px solid #ff9999;
+  border-left:   2px solid #ff9999;
+  border-right:  2px solid #5a0000;
+  border-bottom: 2px solid #5a0000;
+  padding: 6px;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name {
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: 2px;
+  -webkit-text-stroke: 1px #ffaaaa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-status {
+  font-size: 8px;
+  color: #44ff44;
+  letter-spacing: 1px;
+}
+
+.profile-logout {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 6px 10px;
+  background: #c0c0c0;
+  color: #880000;
+  border-top:    2px solid #fff;
+  border-left:   2px solid #fff;
+  border-right:  2px solid #444;
+  border-bottom: 2px solid #444;
+  cursor: pointer;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+.profile-logout:hover  { background: #d4d0c8; }
+.profile-logout:active {
+  border-top:    2px solid #444; border-left:   2px solid #444;
+  border-right:  2px solid #fff; border-bottom: 2px solid #fff;
+}
+
+/* Room action buttons */
+.room-actions {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  background: #2a0000;
+  border-top:    2px solid #ff9999;
+  border-left:   2px solid #ff9999;
+  border-right:  2px solid #5a0000;
+  border-bottom: 2px solid #5a0000;
+  box-shadow: 4px 4px 0 #000, inset 0 0 0 1px #7a0000;
+  padding: 14px 18px;
+  justify-content: center;
+}
+
+/* ── Toast ── */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(40px); }
+}
+
+.toast-stack {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  min-width: 260px;
+  max-width: 360px;
+  /* same window chrome as .modal */
+  background: #2a0000;
+  border-top:    2px solid #ff9999;
+  border-left:   2px solid #ff9999;
+  border-right:  2px solid #5a0000;
+  border-bottom: 2px solid #5a0000;
+  box-shadow: 4px 4px 0 #000;
+  animation: toastIn 0.2s ease forwards;
+}
+
+.toast.toast-out {
+  animation: toastOut 0.3s ease forwards;
+}
+
+.toast.toast-ok {
+  background: #001a00;
+  border-top:    2px solid #99ff99;
+  border-left:   2px solid #99ff99;
+  border-right:  2px solid #005500;
+  border-bottom: 2px solid #005500;
+}
+
+.toast-icon {
+  font-size: 13px;
+  flex-shrink: 0;
+  color: #ff9999;
+}
+
+.toast.toast-ok .toast-icon { color: #99ff99; }
+
+.toast-msg {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #ffe0e0;
+  letter-spacing: 0.5px;
+  line-height: 1.7;
+  flex: 1;
+}
+
+.toast.toast-ok .toast-msg { color: #ccffcc; }
+
+.toast-close {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  background: #c0c0c0;
+  border-top:    2px solid #fff;
+  border-left:   2px solid #fff;
+  border-right:  2px solid #444;
+  border-bottom: 2px solid #444;
+  color: #000;
+  cursor: pointer;
+  padding: 2px 5px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.toast-close:active {
+  border-top:    2px solid #444;
+  border-left:   2px solid #444;
+  border-right:  2px solid #fff;
+  border-bottom: 2px solid #fff;
 }
 
 /* ── Mobile ── */
