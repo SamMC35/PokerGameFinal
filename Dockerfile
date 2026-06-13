@@ -7,12 +7,12 @@ COPY frontend/ ./
 RUN npm run build
 
 # ── Stage 2: Build Spring Boot jar with frontend embedded ─────────────────────
-FROM eclipse-temurin:21-jdk-alpine AS backend-build
+FROM gradle:8.13-jdk21-alpine AS backend-build
 WORKDIR /backend
 COPY backend/PokerJokerJava/ ./
 # Embed the Vite build as Spring Boot static resources
 COPY --from=frontend-build /frontend/dist src/main/resources/static/
-RUN chmod +x gradlew && ./gradlew bootJar --no-daemon -x test
+RUN gradle bootJar --no-daemon -x test
 
 # ── Stage 3: Minimal runtime image ───────────────────────────────────────────
 FROM eclipse-temurin:21-jre-alpine
