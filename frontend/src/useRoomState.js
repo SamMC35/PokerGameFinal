@@ -20,7 +20,7 @@ export default function useRoomState(roomId) {
 
     try {
       client = new Client({
-        brokerURL: `ws://${window.location.hostname}:8080/ws`,
+        brokerURL: `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`,
         reconnectDelay: 5000,
         onConnect: () => {
           client.subscribe(`/topic/room/${roomId}/state`, (msg) => {

@@ -1,9 +1,12 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/poker_joker
-    username: poker
-    password: poker
+    url: jdbc:postgresql://${PGHOST:localhost}:${PGPORT:5432}/${PGDATABASE:poker_joker}
+    username: ${PGUSER:poker}
+    password: ${PGPASSWORD:poker}
   jpa:
     hibernate:
       ddl-auto: update
-      show-sql: true
+    show-sql: false
+
+server:
+  port: ${PORT:8080}

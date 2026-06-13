@@ -10,20 +10,21 @@ export default function useRoomPlayers(roomId, userId) {
 
     try {
       client = new Client({
-        brokerURL: `ws://${window.location.hostname}:8080/ws`,
+        brokerURL: `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`,
         reconnectDelay: 5000,
         onConnect: () => {
-          // Subscribe first …
+          // Subscribe for live updates when other players join later
           client.subscribe(`/topic/room/${roomId}/players`, (msg) => {
             try { setPlayers(JSON.parse(msg.body)) }
             catch (e) { console.error('Failed to parse player list', e) }
           })
 
-          // … then immediately re-add self so the backend broadcasts the full
-          // current playerIds list. This covers the timing gap where the admin's
-          // first addPlayerToRoom fired before this WS subscription was ready.
+          // Re-add self — the HTTP response now returns the full player list
+          // directly, so we don't race the WebSocket broadcast.
           if (userId) {
             fetch(`/addPlayerToRoom?roomId=${roomId}&playerId=${userId}`, { method: 'POST' })
+              .then(r => r.ok ? r.json() : null)
+              .then(players => { if (Array.isArray(players)) setPlayers(players) })
               .catch(() => {})
           }
         },

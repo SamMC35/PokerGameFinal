@@ -164,6 +164,17 @@ function RoomRoute({ user, room }) {
   )
 }
 
+// ── Game page wrapper — clears room session and navigates home on back ───────
+function GameRoute() {
+  const navigate = useNavigate()
+  return (
+    <GamePage onBack={() => {
+      sessionStorage.removeItem('pj_room')
+      navigate('/', { replace: true })
+    }} />
+  )
+}
+
 // ── App (router) ──────────────────────────────────
 export default function App() {
   const session = loadSession()
@@ -177,7 +188,7 @@ export default function App() {
         <Route path="/"           element={<HomePage user={user} setUser={setUser} room={room} setRoom={setRoom} />} />
         <Route path="/room/:id"   element={<RoomRoute user={user} room={room} />} />
         <Route path="/chat"       element={<ChatPage  onBack={() => history.back()} />} />
-        <Route path="/game"       element={<GamePage  onBack={() => history.back()} />} />
+        <Route path="/game"       element={<GameRoute />} />
         <Route path="*"           element={<Navigate to="/" replace />} />
       </Routes>
     </>

@@ -63,7 +63,10 @@ export default function RoomPage({ room, user, isAdmin, onBack }) {
     playKeyClick()
     try {
       const res = await fetch(`/startRoom?roomId=${room.roomId}`, { method: 'POST' })
-      if (!res.ok) showToast('could not start game')
+      if (!res.ok) { showToast('could not start game'); return }
+      // Admin navigates immediately — they triggered the start so there's no
+      // need to wait for the WebSocket echo they just caused.
+      navigate('/game', { state: { players, room, user } })
     } catch {
       showToast('could not reach server')
     }

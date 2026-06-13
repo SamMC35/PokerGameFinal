@@ -79,3 +79,50 @@ export function playModalClose() {
 export function playCardDeal() {
   playTones([880, 660])
 }
+
+export function playChipStack(numChips = 4) {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)()
+
+  for (let i = 0; i < numChips; i++) {
+    const now = ctx.currentTime + i * 0.1
+
+    // Short filtered noise burst — the "click" of a chip landing
+    const bufSize = ctx.sampleRate * 0.04
+    const buffer  = ctx.createBuffer(1, bufSize, ctx.sampleRate)
+    const data    = buffer.getChannelData(0)
+    for (let j = 0; j < bufSize; j++) {
+      data[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / bufSize, 3)
+    }
+
+    const noise = ctx.createBufferSource()
+    noise.buffer = buffer
+
+    // High bandpass for that sharp plastic click
+    const hpf = ctx.createBiquadFilter()
+    hpf.type = 'bandpass'
+    hpf.frequency.value = 2400 + Math.random() * 400  // slight variation per chip
+    hpf.Q.value = 2.5
+
+    // Pitched "ping" underneath — gives it the ceramic ring
+    const osc  = ctx.createOscillator()
+    const ping = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(900 + i * 40, now)   // slightly rising pitch as stack grows
+    ping.gain.setValueAtTime(0.18, now)
+    ping.gain.exponentialRampToValueAtTime(0.001, now + 0.18)
+
+    const noiseGain = ctx.createGain()
+    noiseGain.gain.setValueAtTime(0.35, now)
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04)
+
+    noise.connect(hpf)
+    hpf.connect(noiseGain)
+    noiseGain.connect(ctx.destination)
+
+    osc.connect(ping)
+    ping.connect(ctx.destination)
+
+    noise.start(now); noise.stop(now + 0.04)
+    osc.start(now);   osc.stop(now + 0.18)
+  }
+}
