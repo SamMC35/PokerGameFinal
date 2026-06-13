@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "poker_users")
+@jakarta.persistence.Table(name = "poker_users")
 public class User {
 
     @Id
