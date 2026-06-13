@@ -1,7 +1,5 @@
 package org.sambiswas.pokergame.common.enums;
 
-import lombok.Getter;
-
 public enum Hand {
     HIGH_CARD(1),
     ONE_PAIR(2),
@@ -14,9 +12,9 @@ public enum Hand {
     STRAIGHT_FLUSH(9),
     ROYAL_FLUSH(10);
 
-    @Getter
-    private int value;
-    Hand(int value) {
-        this.value = value;
-    }
+    private final int value;
+
+    Hand(int value) { this.value = value; }
+
+    public int getValue() { return value; }
 }
